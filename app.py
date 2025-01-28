@@ -1,8 +1,10 @@
-from flask import Flask, request, jsonify, render_template
+from flask import Flask, request, jsonify
+from flask_cors import CORS, cross_origin
 from langchain_ollama import OllamaLLM
 from langchain_core.prompts import ChatPromptTemplate
 
 app = Flask(__name__)
+CORS(app, origins="*")
 
 template = """
 Answer the question below.
@@ -15,10 +17,6 @@ model = OllamaLLM(model='llama2')
 prompt = ChatPromptTemplate.from_template(template)
 chain = prompt | model
 
-@app.route('/')
-def home():
-    return render_template('index.html')
-
 @app.route('/chat', methods=['POST'])
 def chat():
     data = request.json
@@ -28,4 +26,4 @@ def chat():
     return jsonify({"response": result})
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=8000,debug=True)

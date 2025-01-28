@@ -8,6 +8,7 @@ langchain = "*"
 langchain-ollama = "*"
 ollama = "*"
 flask = "*"
+flask-cors = "*"
 
 [dev-packages]
 

@@ -1,6 +1,6 @@
 # AI Chatbot
 
-This is a simple AI Chatbot application using langchain_ollama and langchain_core.
+This is a simple AI Chatbot application using langchain_ollama and langchain_core. Must install ollama and download llama2 model.
 
 ## Prerequisites
 

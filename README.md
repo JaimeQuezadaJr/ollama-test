@@ -1,16 +1,6 @@
-Collecting workspace information
-
 # AI Chatbot
 
-This is a simple AI Chatbot application using 
-
-langchain_ollama
-
- and 
-
-langchain_core
-
-.
+This is a simple AI Chatbot application using langchain_ollama and langchain_core.
 
 ## Prerequisites
 
@@ -46,20 +36,9 @@ langchain_core
 
 ## Files
 
-- 
+-  main.py : The main script to run the chatbot.
 
-main.py
-
-: The main script to run the chatbot.
-- 
-
-Pipfile
-
- and 
-
-Pipfile.lock
-
-: Pipenv files for managing dependencies.
+Pipfile and Pipfile.lock: Pipenv files for managing dependencies.
 
 ## License
 

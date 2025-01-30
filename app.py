@@ -13,17 +13,19 @@ Question: {question}
 Answer: 
 """
 
-model = OllamaLLM(model='llama3.2')
+model = OllamaLLM(model="llama3.2")
 prompt = ChatPromptTemplate.from_template(template)
 chain = prompt | model
 
-@app.route('/chat', methods=['POST'])
+
+@app.route("/chat", methods=["POST"])
 def chat():
     data = request.json
-    context = data.get('context', '')
-    question = data.get('question', '')
+    context = data.get("context", "")
+    question = data.get("question", "")
     result = chain.invoke({"context": context, "question": question})
     return jsonify({"response": result})
 
+
 if __name__ == "__main__":
-    app.run(port=8000,debug=True)
+    app.run(host="0.0.0.0", port=8000, debug=True)

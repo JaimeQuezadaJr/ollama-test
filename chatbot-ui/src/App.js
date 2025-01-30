@@ -18,6 +18,8 @@ import Brightness7Icon from '@mui/icons-material/Brightness7';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import './App.css';
 
+const API_URL = process.env.REACT_APP_API_URL;
+
 function App() {
   const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
   const [darkMode, setDarkMode] = useState(() => {
@@ -85,7 +87,7 @@ function App() {
     
     setLoading(true);
     try {
-      const res = await fetch('http://localhost:8000/chat', {
+      const res = await fetch(`http://localhost:8000/chat`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

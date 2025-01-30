@@ -150,7 +150,7 @@ function App() {
               </IconButton>
             </Box>
 
-            <Typography variant="h3" component="h1" gutterBottom align="center">
+            <Typography variant="h5" component="h1" gutterBottom align="center">
               AIME
             </Typography>
             

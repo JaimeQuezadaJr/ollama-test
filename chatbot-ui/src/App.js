@@ -28,7 +28,7 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './App.css';
 
-const API_URL = process.env.REACT_APP_API_URL;
+const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 function App() {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -46,6 +46,25 @@ function App() {
             background: {
                 default: darkMode ? '#121212' : '#f5f5f7',
                 paper: darkMode ? '#1e1e1e' : '#ffffff',
+            },
+        },
+        typography: {
+            h5: {
+                fontSize: {
+                    xs: '1.2rem',
+                    sm: '1.4rem',
+                    md: '1.5rem',
+                    lg: '1.7rem',
+                },
+                fontWeight: 500,
+            },
+            body1: {
+                fontSize: {
+                    xs: '0.875rem',
+                    sm: '0.9rem',
+                    md: '1rem',
+                    lg: '1.1rem',
+                },
             },
         },
     });
@@ -71,6 +90,7 @@ function App() {
     useEffect(() => {
         localStorage.setItem('chatContext', JSON.stringify(context));
     }, [context]);
+
 
     const clearChat = () => {
         setMessages([]);
@@ -113,7 +133,12 @@ function App() {
                                         customStyle={{
                                             margin: 0,
                                             borderRadius: '4px',
-                                            fontSize: '0.9rem',
+                                            fontSize: {
+                                                xs: '0.8rem',
+                                                sm: '0.85rem',
+                                                md: '0.9rem',
+                                                lg: '1rem',
+                                            },
                                         }}
                                     >
                                         {code}
@@ -155,6 +180,12 @@ function App() {
                                             color: 'inherit',
                                             borderColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
                                             fontWeight: 'bold',
+                                            fontSize: {
+                                                xs: '0.8rem',
+                                                sm: '0.85rem',
+                                                md: '0.9rem',
+                                                lg: '1rem',
+                                            },
                                         }}
                                     >
                                         {header}
@@ -171,6 +202,12 @@ function App() {
                                             sx={{ 
                                                 color: 'inherit',
                                                 borderColor: darkMode ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)',
+                                                fontSize: {
+                                                    xs: '0.8rem',
+                                                    sm: '0.85rem',
+                                                    md: '0.9rem',
+                                                    lg: '1rem',
+                                                },
                                             }}
                                         >
                                             {cell}
@@ -207,6 +244,12 @@ function App() {
                                 sx={{ 
                                     mb: 1,
                                     pl: isNumberedItem ? 2 : 0,
+                                    fontSize: {
+                                        xs: '0.875rem',
+                                        sm: '0.9rem',
+                                        md: '1rem',
+                                        lg: '1.1rem',
+                                    },
                                 }}
                             >
                                 {trimmedSegment}
@@ -229,7 +272,12 @@ function App() {
                             <Typography 
                                 key={index} 
                                 variant="body1" 
-                                sx={{ mb: trimmedSegment ? 1 : 0 }}
+                                sx={{ mb: trimmedSegment ? 1 : 0, fontSize: {
+                                    xs: '0.875rem',
+                                    sm: '0.9rem',
+                                    md: '1rem',
+                                    lg: '1.1rem',
+                                } }}
                             >
                                 {trimmedSegment}
                             </Typography>
@@ -240,7 +288,21 @@ function App() {
         }
 
         // Return regular text
-        return <Typography variant="body1">{text}</Typography>;
+        return (
+            <Typography 
+                variant="body1" 
+                sx={{ 
+                    fontSize: {
+                        xs: '0.875rem',
+                        sm: '0.9rem',
+                        md: '1rem',
+                        lg: '1.1rem',
+                    }
+                }}
+            >
+                {text}
+            </Typography>
+        );
     };
 
     const downloadCSV = (csvData, filename = 'data.csv') => {
@@ -263,7 +325,7 @@ function App() {
         
         setLoading(true);
         try {
-            const res = await fetch(`http://localhost:8000/chat`, {
+            const res = await fetch(`${REACT_APP_API_URL}/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -354,6 +416,12 @@ function App() {
                             sx={{ 
                                 mb: 4,
                                 color: darkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+                                fontSize: {
+                                    xs: '1.2rem',
+                                    sm: '1.4rem',
+                                    md: '1.5rem',
+                                    lg: '1.7rem',
+                                },
                             }}
                         >
                             AIME
@@ -390,6 +458,12 @@ function App() {
                                             },
                                             '&.Mui-focused fieldset': {
                                                 borderColor: 'primary.main',
+                                            },
+                                            fontSize: {
+                                                xs: '0.875rem',
+                                                sm: '0.9rem',
+                                                md: '1rem',
+                                                lg: '1.1rem',
                                             },
                                         },
                                     }}
@@ -517,6 +591,12 @@ function App() {
                                                 },
                                                 '&.Mui-focused fieldset': {
                                                     borderColor: 'primary.main',
+                                                },
+                                                fontSize: {
+                                                    xs: '0.875rem',
+                                                    sm: '0.9rem',
+                                                    md: '1rem',
+                                                    lg: '1.1rem',
                                                 },
                                             },
                                         }}

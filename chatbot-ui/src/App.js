@@ -23,6 +23,7 @@ import SendIcon from '@mui/icons-material/Send';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
+import DownloadIcon from '@mui/icons-material/Download';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -204,6 +205,20 @@ function App() {
         return <Typography variant="body1">{text}</Typography>;
     };
 
+    const downloadCSV = (csvData, filename = 'data.csv') => {
+        const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        if (navigator.msSaveBlob) { // IE 10+
+            navigator.msSaveBlob(blob, filename);
+        } else {
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!question.trim()) return;
@@ -221,9 +236,17 @@ function App() {
                 throw new Error('Network response was not ok');
             }
             const data = await res.json();
+            
+            // Create message object with CSV data if available
+            const aiMessage = {
+                sender: 'AI',
+                text: data.response,
+                csvData: data.csvData
+            };
+            
             setMessages((prev) => [...prev, 
                 { sender: 'User', text: question }, 
-                { sender: 'AI', text: data.response }
+                aiMessage
             ]);
             setContext((prev) => `${prev}\nUser: ${question}\nAI: ${data.response}`);
             setQuestion('');
@@ -378,9 +401,31 @@ function App() {
                                                         bgcolor: msg.sender === 'User' ? 'primary.main' : darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
                                                         color: msg.sender === 'User' ? 'white' : 'text.primary',
                                                         borderRadius: 2,
+                                                        position: 'relative',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        gap: 2,
                                                     }}
                                                 >
-                                                    {formatMessageContent(msg.text)}
+                                                    <Typography variant="body1">
+                                                        {msg.csvData ? "Table converted to CSV" : formatMessageContent(msg.text)}
+                                                    </Typography>
+                                                    {msg.csvData && (
+                                                        <IconButton
+                                                            onClick={() => downloadCSV(msg.csvData)}
+                                                            size="small"
+                                                            sx={{
+                                                                color: darkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+                                                                '&:hover': {
+                                                                    color: darkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+                                                                },
+                                                                ml: 'auto',  // Push button to the right
+                                                            }}
+                                                            title="Download CSV"
+                                                        >
+                                                            <DownloadIcon />
+                                                        </IconButton>
+                                                    )}
                                                 </Box>
                                             </Box>
                                         ))}

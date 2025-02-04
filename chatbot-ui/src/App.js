@@ -24,6 +24,8 @@ import Brightness4Icon from '@mui/icons-material/Brightness4';
 import Brightness7Icon from '@mui/icons-material/Brightness7';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DownloadIcon from '@mui/icons-material/Download';
+import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './App.css';
 
 const API_URL = process.env.REACT_APP_API_URL;
@@ -90,6 +92,42 @@ function App() {
     }, [darkMode]);
 
     const formatMessageContent = (text) => {
+        // Handle code blocks first (text between triple backticks)
+        if (text.includes('```')) {
+            const parts = text.split(/(```[\s\S]*?```)/);
+            return (
+                <Box>
+                    {parts.map((part, index) => {
+                        if (part.startsWith('```') && part.endsWith('```')) {
+                            // Extract language and code
+                            const codeContent = part.slice(3, -3);
+                            const firstLineBreak = codeContent.indexOf('\n');
+                            const language = firstLineBreak > -1 ? codeContent.slice(0, firstLineBreak).trim() : '';
+                            const code = firstLineBreak > -1 ? codeContent.slice(firstLineBreak + 1).trim() : codeContent.trim();
+
+                            return (
+                                <Box key={index} sx={{ my: 2 }}>
+                                    <SyntaxHighlighter
+                                        language={language || 'plaintext'}
+                                        style={darkMode ? oneDark : oneLight}
+                                        customStyle={{
+                                            margin: 0,
+                                            borderRadius: '4px',
+                                            fontSize: '0.9rem',
+                                        }}
+                                    >
+                                        {code}
+                                    </SyntaxHighlighter>
+                                </Box>
+                            );
+                        }
+                        // Handle regular text
+                        return part && <Typography key={index} variant="body1" sx={{ my: 1 }}>{part}</Typography>;
+                    })}
+                </Box>
+            );
+        }
+
         // Handle tables first
         if (text.includes('|')) {
             const lines = text.trim().split('\n');
@@ -398,18 +436,29 @@ function App() {
                                                     sx={{
                                                         p: 2,
                                                         maxWidth: msg.sender === 'User' ? '70%' : '85%',
+                                                        width: msg.text.includes('```') ? '100%' : 'auto',
                                                         bgcolor: msg.sender === 'User' ? 'primary.main' : darkMode ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)',
                                                         color: msg.sender === 'User' ? 'white' : 'text.primary',
                                                         borderRadius: 2,
                                                         position: 'relative',
                                                         display: 'flex',
-                                                        alignItems: 'center',
+                                                        alignItems: msg.csvData ? 'center' : 'stretch',
                                                         gap: 2,
+                                                        overflow: 'hidden',
                                                     }}
                                                 >
-                                                    <Typography variant="body1">
-                                                        {msg.csvData ? "Table converted to CSV" : formatMessageContent(msg.text)}
-                                                    </Typography>
+                                                    <Box sx={{ 
+                                                        width: '100%',
+                                                        overflowX: 'auto',
+                                                    }}>
+                                                        {msg.csvData ? (
+                                                            <Typography variant="body1">
+                                                                Table converted to CSV
+                                                            </Typography>
+                                                        ) : (
+                                                            formatMessageContent(msg.text)
+                                                        )}
+                                                    </Box>
                                                     {msg.csvData && (
                                                         <IconButton
                                                             onClick={() => downloadCSV(msg.csvData)}
@@ -419,7 +468,7 @@ function App() {
                                                                 '&:hover': {
                                                                     color: darkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
                                                                 },
-                                                                ml: 'auto',  // Push button to the right
+                                                                flexShrink: 0,
                                                             }}
                                                             title="Download CSV"
                                                         >

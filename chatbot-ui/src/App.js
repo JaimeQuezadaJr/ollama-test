@@ -82,6 +82,7 @@ function App() {
     const [question, setQuestion] = useState('');
     const [loading, setLoading] = useState(false);
     const messagesEndRef = useRef(null);
+    const chatContainerRef = useRef(null);
 
     useEffect(() => {
         localStorage.setItem('chatMessages', JSON.stringify(messages));
@@ -101,6 +102,15 @@ function App() {
 
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
+
+    const scrollToTop = () => {
+        if (chatContainerRef.current) {
+            chatContainerRef.current.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
     };
 
     useEffect(() => {
@@ -413,6 +423,7 @@ function App() {
                             component="h1" 
                             gutterBottom 
                             align="center" 
+                            onClick={scrollToTop}
                             sx={{ 
                                 mb: 4,
                                 color: darkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
@@ -422,6 +433,11 @@ function App() {
                                     md: '1.5rem',
                                     lg: '1.7rem',
                                 },
+                                cursor: 'pointer',
+                                '&:hover': {
+                                    opacity: 0.8,
+                                },
+                                transition: 'opacity 0.2s ease',
                             }}
                         >
                             AIME
@@ -495,7 +511,7 @@ function App() {
                                         background: darkMode ? '#555' : '#888',
                                         borderRadius: '4px',
                                     },
-                                }}>
+                                }} ref={chatContainerRef}>
                                     <Box sx={{ px: 2, pb: 2 }}>
                                         {messages.map((msg, index) => (
                                             <Box

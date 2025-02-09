@@ -1,7 +1,22 @@
+html {
+    position: fixed;
+    height: 100%;
+    overflow: hidden;
+}
+
 body {
-  margin: 0;
-  padding: 0;
-  background-color: #f5f5f7;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: #f5f5f7;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+/* Prevent pull-to-refresh on mobile */
+body {
+    overscroll-behavior-y: none;
 }
 
 /* Remove all other styles as they're now handled by Material-UI */

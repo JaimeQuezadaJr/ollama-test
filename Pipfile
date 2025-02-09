@@ -10,6 +10,7 @@ ollama = "*"
 flask = "*"
 flask-cors = "*"
 pandas = "*"
+flask-sqlalchemy = "*"
 
 [dev-packages]
 

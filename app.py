@@ -18,6 +18,7 @@ db = SQLAlchemy(app)
 
 class Conversation(db.Model):
     id = db.Column(db.Integer, primary_key=True)
+    title = db.Column(db.String(200), default="New Conversation")
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
     messages = db.relationship("Message", backref="conversation", lazy=True)
 
@@ -109,6 +110,7 @@ def get_conversations():
         [
             {
                 "id": c.id,
+                "title": c.title,
                 "created_at": c.created_at,
                 "messages": [
                     {"sender": m.sender, "text": m.text, "created_at": m.created_at}
@@ -123,7 +125,7 @@ def get_conversations():
 @app.route("/conversations", methods=["POST"])
 def save_conversation():
     data = request.json
-    conversation = Conversation()
+    conversation = Conversation(title=data.get("title", "New Conversation"))
     db.session.add(conversation)
 
     for msg in data["messages"]:
@@ -142,6 +144,7 @@ def get_conversation(conversation_id):
     return jsonify(
         {
             "id": conversation.id,
+            "title": conversation.title,
             "created_at": conversation.created_at,
             "messages": [
                 {"sender": msg.sender, "text": msg.text, "created_at": msg.created_at}
@@ -157,6 +160,15 @@ def delete_conversation(conversation_id):
     db.session.delete(conversation)
     db.session.commit()
     return jsonify({"message": "Conversation deleted successfully"})
+
+
+@app.route("/conversations/<int:conversation_id>/title", methods=["PUT"])
+def update_conversation_title(conversation_id):
+    conversation = Conversation.query.get_or_404(conversation_id)
+    data = request.json
+    conversation.title = data.get("title", "New Conversation")
+    db.session.commit()
+    return jsonify({"message": "Title updated successfully"})
 
 
 # Add this after creating the app and before running it

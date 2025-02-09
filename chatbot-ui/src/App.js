@@ -30,6 +30,9 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DownloadIcon from '@mui/icons-material/Download';
 import SaveIcon from '@mui/icons-material/Save';
 import MenuIcon from '@mui/icons-material/Menu';
+import EditIcon from '@mui/icons-material/Edit';
+import DoneIcon from '@mui/icons-material/Done';
+import CloseIcon from '@mui/icons-material/Close';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './App.css';
@@ -94,6 +97,8 @@ function App() {
     const [conversations, setConversations] = useState([]);
     const [currentConversationId, setCurrentConversationId] = useState(null);
     const [drawerOpen, setDrawerOpen] = useState(false);
+    const [editingTitle, setEditingTitle] = useState(null);
+    const [newTitle, setNewTitle] = useState("");
 
     useEffect(() => {
         localStorage.setItem('chatMessages', JSON.stringify(messages));
@@ -405,11 +410,15 @@ function App() {
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({ messages }),
+                body: JSON.stringify({ 
+                    messages,
+                    title: `Conversation ${new Date().toLocaleString()}`
+                }),
             });
             if (!res.ok) throw new Error('Failed to save conversation');
             const data = await res.json();
             setCurrentConversationId(data.id);
+            loadConversations();
         } catch (error) {
             console.error('Error saving conversation:', error);
         }
@@ -451,6 +460,29 @@ function App() {
             setConversations(prev => prev.filter(conv => conv.id !== conversationId));
         } catch (error) {
             console.error('Error deleting conversation:', error);
+        }
+    };
+
+    const updateConversationTitle = async (conversationId, newTitle) => {
+        try {
+            const res = await fetch(`${REACT_APP_API_URL}/conversations/${conversationId}/title`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ title: newTitle }),
+            });
+            if (!res.ok) throw new Error('Failed to update title');
+            
+            // Update local state
+            setConversations(prev => prev.map(conv => 
+                conv.id === conversationId 
+                    ? { ...conv, title: newTitle }
+                    : conv
+            ));
+            setEditingTitle(null);
+        } catch (error) {
+            console.error('Error updating title:', error);
         }
     };
 
@@ -932,25 +964,95 @@ function App() {
                                     button
                                     onClick={() => loadConversation(conv.id)}
                                     secondaryAction={
-                                        <IconButton 
-                                            edge="end" 
-                                            aria-label="delete"
-                                            onClick={(e) => deleteConversation(conv.id, e)}
-                                            sx={{
-                                                color: darkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
-                                                '&:hover': {
-                                                    color: darkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
-                                                }
-                                            }}
-                                        >
-                                            <DeleteOutlineIcon />
-                                        </IconButton>
+                                        <Box sx={{ display: 'flex', gap: 1 }}>
+                                            {editingTitle === conv.id ? (
+                                                <>
+                                                    <IconButton
+                                                        edge="end"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            updateConversationTitle(conv.id, newTitle);
+                                                        }}
+                                                        sx={{
+                                                            color: darkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+                                                            '&:hover': {
+                                                                color: darkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+                                                            }
+                                                        }}
+                                                    >
+                                                        <DoneIcon />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        edge="end"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setEditingTitle(null);
+                                                        }}
+                                                        sx={{
+                                                            color: darkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+                                                            '&:hover': {
+                                                                color: darkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+                                                            }
+                                                        }}
+                                                    >
+                                                        <CloseIcon />
+                                                    </IconButton>
+                                                </>
+                                            ) : (
+                                                <>
+                                                    <IconButton
+                                                        edge="end"
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setEditingTitle(conv.id);
+                                                            setNewTitle(conv.title);
+                                                        }}
+                                                        sx={{
+                                                            color: darkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+                                                            '&:hover': {
+                                                                color: darkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+                                                            }
+                                                        }}
+                                                    >
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                    <IconButton
+                                                        edge="end"
+                                                        onClick={(e) => deleteConversation(conv.id, e)}
+                                                        sx={{
+                                                            color: darkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+                                                            '&:hover': {
+                                                                color: darkMode ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
+                                                            }
+                                                        }}
+                                                    >
+                                                        <DeleteOutlineIcon />
+                                                    </IconButton>
+                                                </>
+                                            )}
+                                        </Box>
                                     }
                                 >
-                                    <ListItemText
-                                        primary={`Conversation ${conv.id}`}
-                                        secondary={new Date(conv.created_at).toLocaleString()}
-                                    />
+                                    {editingTitle === conv.id ? (
+                                        <TextField
+                                            value={newTitle}
+                                            onChange={(e) => setNewTitle(e.target.value)}
+                                            onClick={(e) => e.stopPropagation()}
+                                            autoFocus
+                                            size="small"
+                                            fullWidth
+                                            sx={{
+                                                '& .MuiOutlinedInput-root': {
+                                                    backgroundColor: darkMode ? 'rgba(255, 255, 255, 0.03)' : 'rgba(0, 0, 0, 0.05)',
+                                                }
+                                            }}
+                                        />
+                                    ) : (
+                                        <ListItemText
+                                            primary={conv.title || `Conversation ${conv.id}`}
+                                            secondary={new Date(conv.created_at).toLocaleString()}
+                                        />
+                                    )}
                                 </ListItem>
                             ))}
                         </List>

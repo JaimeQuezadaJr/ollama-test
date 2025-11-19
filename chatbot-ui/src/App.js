@@ -37,15 +37,15 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import './App.css';
 
-const REACT_APP_API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000'
-
-
 function App() {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const [darkMode, setDarkMode] = useState(() => {
         const savedMode = localStorage.getItem('darkMode');
         return savedMode !== null ? JSON.parse(savedMode) : prefersDarkMode;
     });
+
+    // Dynamic API URL with fallback
+    const [apiUrl, setApiUrl] = useState(process.env.REACT_APP_API_URL || 'http://localhost:8000');
 
     const theme = createTheme({
         palette: {
@@ -116,6 +116,34 @@ function App() {
             metaThemeColor.setAttribute("content", darkMode ? "#000000" : "#f5f5f7");
         }
     }, [darkMode]);
+
+    // Check API connection and fallback to localhost if needed
+    useEffect(() => {
+        const checkApiConnection = async () => {
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 second timeout
+                
+                const response = await fetch(`${apiUrl}/conversations`, {
+                    method: 'GET',
+                    signal: controller.signal,
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (!response.ok) {
+                    throw new Error('API not accessible');
+                }
+            } catch (error) {
+                console.warn(`Could not connect to ${apiUrl}, falling back to localhost`);
+                setApiUrl('http://localhost:8000');
+            }
+        };
+
+        if (apiUrl !== 'http://localhost:8000') {
+            checkApiConnection();
+        }
+    }, []); // Run once on component mount
 
     const clearChat = () => {
         setMessages([]);
@@ -359,7 +387,7 @@ function App() {
         
         setLoading(true);
         try {
-            const res = await fetch(`${REACT_APP_API_URL}/chat`, {
+            const res = await fetch(`${apiUrl}/chat`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -393,7 +421,7 @@ function App() {
 
     const loadConversations = async () => {
         try {
-            const res = await fetch(`${REACT_APP_API_URL}/conversations`);
+            const res = await fetch(`${apiUrl}/conversations`);
             if (!res.ok) throw new Error('Failed to load conversations');
             const data = await res.json();
             setConversations(data);
@@ -406,7 +434,7 @@ function App() {
         if (messages.length === 0) return;
         
         try {
-            const res = await fetch(`${REACT_APP_API_URL}/conversations`, {
+            const res = await fetch(`${apiUrl}/conversations`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -427,7 +455,7 @@ function App() {
 
     const loadConversation = async (conversationId) => {
         try {
-            const res = await fetch(`${REACT_APP_API_URL}/conversations/${conversationId}`);
+            const res = await fetch(`${apiUrl}/conversations/${conversationId}`);
             if (!res.ok) throw new Error('Failed to load conversation');
             const data = await res.json();
             
@@ -452,7 +480,7 @@ function App() {
     const deleteConversation = async (conversationId, event) => {
         event.stopPropagation(); // Prevent triggering the conversation load
         try {
-            const res = await fetch(`${REACT_APP_API_URL}/conversations/${conversationId}`, {
+            const res = await fetch(`${apiUrl}/conversations/${conversationId}`, {
                 method: 'DELETE',
             });
             if (!res.ok) throw new Error('Failed to delete conversation');
@@ -466,7 +494,7 @@ function App() {
 
     const updateConversationTitle = async (conversationId, newTitle) => {
         try {
-            const res = await fetch(`${REACT_APP_API_URL}/conversations/${conversationId}/title`, {
+            const res = await fetch(`${apiUrl}/conversations/${conversationId}/title`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',

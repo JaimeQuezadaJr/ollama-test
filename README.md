@@ -1,6 +1,6 @@
-# AI Chatbot
+# Local AI Assistant
 
-This is a full-stack AI Chatbot application using langchain_ollama, langchain_core, FastAPI for the backend, and React with Material-UI for the frontend.
+This is a full-stack local AI assistant application using langchain_ollama, langchain_core, Flask for the backend, and React with Material-UI for the frontend. Customized to present the information in a user friendly graphical interface with the ability to save conversations.
 
 ## Prerequisites
 
@@ -45,17 +45,16 @@ ollama serve
 
 Leave this terminal running.
 
-### Step 2: Start the Backend (FastAPI)
+### Step 2: Start the Backend (Flask)
 
 Open a new terminal and run:
 
 ```sh
-cd backend
 pipenv shell
-python main.py
+python app.py
 ```
 
-The backend API will start on `http://localhost:8000`.
+The Flask backend API will start on `http://localhost:8000`.
 
 ### Step 3: Start the Frontend (React)
 
@@ -70,9 +69,9 @@ The React app will start on `http://localhost:3000` and automatically open in yo
 
 ## Project Structure
 
-- `backend/` - FastAPI backend server
-  - `main.py` - Main backend application
-  - `conversations.db` - SQLite database for conversation history
+- `app.py` - Flask backend server
+  - Handles chat requests and conversation management
+  - SQLite database for conversation history (`conversations.db`)
 
 - `chatbot-ui/` - React frontend application
   - Built with Material-UI
@@ -89,10 +88,7 @@ The React app will start on `http://localhost:3000` and automatically open in yo
 ## Environment Variables (Optional)
 
 ### Backend
-Create a `.env` file in the `backend/` directory if you need custom configuration:
-```
-PORT=8000
-```
+The Flask backend runs on port 8000 by default. You can modify the port in `app.py` if needed.
 
 ### Frontend
 Create a `.env` file in the `chatbot-ui/` directory to configure the API URL:

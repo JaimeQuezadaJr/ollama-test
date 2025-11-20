@@ -1,6 +1,6 @@
 # Local AI Assistant
 
-This is a full-stack local AI assistant application using langchain_ollama, langchain_core, Flask for the backend, and React with Material-UI for the frontend. Customized to present the information in a user friendly graphical interface with the ability to save conversations.
+Built AIME (AI Messaging Expert). This is a full-stack local AI assistant application powered by Llama 3.2 using langchain_ollama, langchain_core, Flask for the backend, and React with Material-UI for the frontend. Customized to present the information in a user friendly graphical interface with the ability to save conversations.
 
 **Access from any device:** Use this application on any browser on any device within your home network - including phones, tablets, and other computers.
 

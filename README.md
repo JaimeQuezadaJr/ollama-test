@@ -73,25 +73,7 @@ cd ollama-test/chatbot-ui
 npm start
 ```
 
-The React app will start on `http://localhost:3000` and automatically open in your browser.
-
-## Project Structure
-
-- `app.py` - Flask backend server
-  - Handles chat requests and conversation management
-  - SQLite database for conversation history (`conversations.db`)
-
-- `chatbot-ui/` - React frontend application
-  - Built with Material-UI
-  - Features: dark mode, conversation history, auto-scrolling chat
-
-## Features
-
-- Real-time chat with AI powered by Ollama's llama2 model
-- Conversation history management (save, load, delete)
-- Dark mode toggle
-- Responsive Material-UI design
-- Context-aware responses
+The React app will start on `http://localhost:3000` and automatically open in your browser. 
 
 ## Accessing from Other Devices on Your Network
 
@@ -145,6 +127,126 @@ The Flask backend runs on port 8000 by default. You can modify the port in `app.
 
 ### Frontend (Local Use Only)
 If you're only using the app on your local machine, the frontend will automatically use `http://localhost:8000` without any configuration needed.
+
+## Running with Docker (Alternative)
+
+Docker provides an isolated environment and handles all dependencies automatically, including Ollama and the llama3.2 model.
+
+### Prerequisites
+
+- Docker Desktop installed ([Download here](https://www.docker.com/products/docker-desktop))
+- Docker Compose (included with Docker Desktop)
+
+### Quick Start
+
+**Important:** Make sure you're in the root `ollama-test` directory before running Docker commands.
+
+1. **Build and start all services:**
+   ```sh
+   cd ollama-test  # If not already in the project root
+   docker-compose up --build
+   ```
+
+2. **Access the application:**
+   - Frontend: `http://localhost:3000`
+   - Backend API: `http://localhost:8000`
+
+3. **Stop all services:**
+   ```sh
+   docker-compose down
+   ```
+
+### What Docker Does
+
+- **Backend Container**: 
+  - Installs Ollama and downloads llama3.2 model automatically
+  - Runs Flask backend on port 8000
+  - Persists database in `./data` directory
+
+- **Frontend Container**:
+  - Installs Node.js dependencies
+  - Runs React development server on port 3000
+  - Hot-reloads on code changes
+
+- **Data Persistence**:
+  - Database: Stored in `./data/conversations.db`
+  - Ollama models: Stored in Docker volume (persists across restarts)
+
+### Performance Note
+
+**Important:** The Dockerized version may run slower than running the application natively on your computer. This is normal and expected due to:
+- Container overhead and virtualization
+- Model loading times in containerized environments
+- Network communication between containers
+- Resource limits in Docker Desktop (especially on Mac/Windows)
+
+**Expected performance difference:**
+- First request: 2-3x slower (model loading)
+- Subsequent requests: 10-30% slower (container overhead)
+
+For maximum performance during development, consider running the application natively. Docker is ideal for consistent environments, easy deployment, and testing.
+
+### Docker Commands
+
+**Note:** All Docker commands should be run from the root `ollama-test` directory.
+
+**Main command to start everything:**
+```sh
+cd ollama-test  # Navigate to project root if needed
+docker-compose up --build
+```
+This single command builds the images, downloads dependencies, and starts both frontend and backend containers.
+
+**Other useful commands:**
+```sh
+# Start services in background (detached mode)
+docker-compose up -d
+
+# View logs from all containers
+docker-compose logs -f
+
+# View logs from a specific container
+docker-compose logs -f backend
+docker-compose logs -f frontend
+
+# Stop services (keeps data)
+docker-compose down
+
+# Stop services and remove all data (database and models)
+docker-compose down -v
+
+# Rebuild after code changes
+docker-compose up --build
+```
+
+### Production Deployment
+
+For production, use the production configuration:
+
+```sh
+docker-compose -f docker-compose.prod.yml up --build
+```
+
+**Note**: The first startup may take several minutes as it downloads the llama3.2 model (several GB). Subsequent starts will be much faster.
+
+## Project Structure
+
+- `app.py` - Flask backend server
+  - Handles chat requests and conversation management
+  - SQLite database for conversation history (`conversations.db`)
+
+- `chatbot-ui/` - React frontend application
+  - Built with Material-UI
+  - Features: dark mode, conversation history, auto-scrolling chat
+
+## Features
+
+- Real-time chat with AI powered by Ollama's llama2 model
+- Conversation history management (save, load, delete)
+- Dark mode toggle
+- Responsive Material-UI design
+- Context-aware responses
+
 
 ## License
 

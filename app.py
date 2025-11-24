@@ -5,14 +5,16 @@ from langchain_core.prompts import ChatPromptTemplate
 import pandas as pd
 import io
 import re
+import os
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 
 app = Flask(__name__)
 CORS(app, origins="*")
-app.config["SQLALCHEMY_DATABASE_URI"] = (
-    "sqlite:///conversations.db"  # or use PostgreSQL/MySQL
-)
+
+# Use persistent data directory in Docker, otherwise current directory
+db_path = os.path.join(os.getenv("DATA_DIR", "."), "conversations.db")
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{db_path}"
 db = SQLAlchemy(app)
 
 
